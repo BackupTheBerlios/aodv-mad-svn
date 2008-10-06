@@ -204,3 +204,6 @@
 * Use route metric when deleting routes instead of always using 1. 
   (Thanks to Vlasios Tsiatsis <vlasios.tsiatsis@ericsson.com>)
 * Compile against Linux 2.6.22
+
+0.9.6:
+* Fork for the Openmoko project
