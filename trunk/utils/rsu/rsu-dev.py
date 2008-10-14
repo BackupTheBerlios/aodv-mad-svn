@@ -34,27 +34,14 @@ import syslog
 import time
 import os
 
-debug = 1 
-end = 0
-
-def sigterm_handler(signum, frame):
-    global end 
-
-    if debug:
-        quote = 'broadpro: Signal handler called with signal ' + str(signum)
-        syslog.syslog(quote)
-    end = 1    
-
 def main():
-    signal.signal(signal.SIGTERM, sigterm_handler)
 
     if len(sys.argv) == 5:
 
         addr = (sys.argv[1], int(sys.argv[2]))  # VANET broadcast address
-        if debug:
-            quote = 'broadpro: Sending broadcast messages to ' + addr[0] + ':' + str(addr[1])
-            syslog.syslog(quote)
-
+        quote = 'broadpro: Sending broadcast messages to ' + addr[0] + ':' + str(addr[1])
+	print quote
+		
         # Create socket
         UDPSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
 
@@ -62,16 +49,14 @@ def main():
             UDPSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
         try:
-            while end != 1:
-                data = sys.argv[3]
+		data = sys.argv[3]
 		
 		#for i in range(100):
 		#	data = "message #" + str(i)
                 #	UDPSock.sendto(data, addr)
 	        #        time.sleep(0.1)
 
-                UDPSock.sendto(data, addr)
-                time.sleep(int(sys.argv[4]))
+		UDPSock.sendto(data, addr)
 
         except IOError:
             quote = 'IOError exception caught'
