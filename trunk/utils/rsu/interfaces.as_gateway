@@ -1,0 +1,47 @@
+auto lo
+iface lo inet loopback
+	pre-up wlanconfig ath0 destroy
+	pre-up wlanconfig ath0 create wlandev wifi0 wlanmode adhoc
+
+#auto eth0
+#jiface eth0 inet dhcp
+#	hostname gw1-alix
+#	pre-up iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+#	pre-down iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+#	post-up /etc/init.d/hybridnode start
+#	post-up broadpro.py 192.168.0.255 33333 "gw1 message" 1
+#	pre-down /etc/init.d/hybridnode stop
+	
+auto eth0
+iface eth0 inet static
+	address 10.95.88.55
+	netmask 255.255.255.224
+	network 10.95.88.32
+	broadcast 10.95.88.63
+	gateway 10.95.88.33
+	pre-up iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+	pre-down iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+	post-up /etc/init.d/hybridnode start
+	post-up broadpro.py 192.168.0.255 33333 "gw1 message" 1
+	pre-down /etc/init.d/hybridnode stop
+
+iface ppp0 inet manual
+	up pppd
+	post-up route add 195.235.93.163 dev ppp0 
+	post-up route add -net 88.28.0.0 netmask 255.255.0.0 dev ppp0 
+	post-up route add -net 88.29.0.0 netmask 255.255.0.0 dev ppp0 
+	post-up route add -net 88.30.0.0 netmask 255.255.0.0 dev ppp0 
+	post-up route del default dev eth0
+	post-up route add default dev ppp0 
+	post-up /etc/init.d/hybridnode start
+	down shutdown -r now
+
+iface ath0 inet static
+	pre-up ifconfig ath0 mtu 1476
+	pre-up iwconfig ath0 essid VANET channel 7
+	address 192.168.0.218
+	network 192.168.0.0
+	netmask 255.255.255.0
+	broadcast 192.168.0.255
+	
+	

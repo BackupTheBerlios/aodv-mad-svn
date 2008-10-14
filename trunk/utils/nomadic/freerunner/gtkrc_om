@@ -1,0 +1,242 @@
+# Moko GTK+ theme
+#
+# Copyright 2007 OpenedHand Ltd <info@openedhand.com>
+# Based on OpenedHand's Sato GTK+ Theme
+#
+# This theme uses several style properties introduced in GTK+ 2.10
+#
+# black: #333333
+# orange: #ff7d00
+#
+
+gtk-button-images = 0
+gtk-menu-images = 0
+gtk-icon-sizes = "gtk-button=32,32:gtk-small-toolbar=48,48:gtk-large-toolbar=48,48"
+
+# Set the default gtk-color-scheme property
+#gtk_color_scheme = "fg_color:#222;bg_color:#000;base_color:#000;text_color:#ddd;selected_bg_color:#f00;selected_fg_color:#ddd"
+gtk_color_scheme = "fg_color:#204a87;bg_color:#7BB7F7;base_color:#204a87;text_color:#ddd;selected_bg_color:#3475AE;selected_fg_color:#ddd"
+style "default"
+{
+
+  xthickness = 2
+  ythickness = 2
+
+  GtkButton::default_border = {0, 0, 0, 0}
+  GtkButton::focus-line-width = 0
+  GtkCheckButton::indicator-size = 35
+  GtkCheckButton::indicator-spacing = 5
+  GtkCheckMenuItem::indicator_size = 18
+  GtkEntry::inner_border = {5, 5, 5, 5}
+  GtkFrame::shadow_type = GTK_SHADOW_NONE
+  GtkPaned::handle-size = 16
+  GtkRange::slider-width = 28
+  GtkRange::trough_border = 0
+  GtkScale::slider-length = 64
+  GtkScrollbar::has_backward_stepper = 0
+  GtkScrollbar::has_forward_stepper = 1
+  GtkScrollbar::has_secondary_backward_stepper = 1
+  GtkScrollbar::has_secondary_forward_stepper = 0
+  GtkScrollbar::slider_width = 30
+  GtkScrollbar::stepper_size = 26
+  GtkScrollbar::stepper_spacing = 0
+  GtkSpinButton::shadow_type = GTK_SHADOW_NONE
+  GtkTreeView::allow_rules = 1
+  #GtkTreeView::even_row_color = "#fff"
+  #GtkTreeView::odd_row_color = "#e7e7e7"
+  GtkTreeView::vertical_separator = 6
+  GtkWidget::focus_line_width = 2
+  GtkWidget::focus_padding = 0
+  GtkWidget::scroll-arrow-vlength = 48
+  GtkWidget::scroll-arrow-hlength = 48
+
+  MokoDialerTextview::large_font = 20
+  MokoDialerTextview::medium_font = 15
+  MokoDialerTextview::medium_font = 15
+  MokoDialerTextview::small_font = 10
+
+  fg [NORMAL] = @text_color
+  fg [PRELIGHT] = @fg_color
+  fg [ACTIVE] = @text_color
+  fg [INSENSITIVE] = @fg_color
+  fg [SELECTED] = @selected_fg_color
+
+  bg [NORMAL] = @bg_color
+  bg [PRELIGHT] = @bg_color
+  bg [ACTIVE] = @fg_color
+  bg [INSENSITIVE] = lighter (@bg_color)
+  bg [SELECTED] = @bg_color
+
+  text [NORMAL] = @text_color
+  text [PRELIGHT] = @text_color
+  text [SELECTED] = @text_color
+  text [ACTIVE] = @text_color
+
+  base [NORMAL] = @base_color
+  base [SELECTED] = @text_color
+  base [ACTIVE] = @base_color
+
+  engine "moko-engine" {
+    border = FALSE
+    gradient = TRUE
+  }
+}
+
+class "GtkWidget" style "default"
+
+style "reversed"
+{
+  bg[NORMAL] = @fg_color
+  fg[NORMAL] = @bg_color
+
+  bg[PRELIGHT] = @fg_color
+  fg[PRELIGHT] = @bg_color
+}
+
+widget_class "*GtkButton*" style "reversed"
+
+style "button"
+{
+  GtkButton::inner_border = {5, 5, 5, 5}
+
+  engine "moko-engine" {
+    border = FALSE
+    gradient = TRUE
+  }
+}
+
+style "treeview-header" {
+
+  # inner-border was added in GTK+ 2.10
+  GtkButton::inner_border = {0, 0, 0, 0}
+
+  bg[NORMAL] = "#eee"
+  fg[NORMAL] = "#000"
+
+  bg[PRELIGHT] = "#eee"
+  fg[PRELIGHT] = "#000"
+
+  engine "moko-engine" {
+    border = FALSE
+    gradient = TRUE
+  }
+}
+widget_class "*GtkTreeView.GtkButton*" style "treeview-header"
+
+style "combo" {
+  bg[NORMAL] = @bg_color
+  text[NORMAL] = @fg_color
+
+  bg[PRELIGHT] = @bg_color
+  text[PRELIGHT] = @fg_color
+
+  engine "moko-engine" {
+    border = FALSE
+    gradient = TRUE
+  }
+}
+widget_class "*Combo*" style "combo"
+
+style "toolbar"
+{
+  GtkToolbar::internal_padding = 0
+  xthickness = 0
+  ythickness = 0
+
+  engine "moko-engine" {
+    border = FALSE
+    gradient = TRUE
+  }
+}
+class "GtkToolbar" style "toolbar"
+#class "GtkToolbar" style "reversed"
+
+style "toolitem"
+{
+  xthickness = 12
+  ythickness = 12
+
+  bg[NORMAL] = @bg_color
+  fg[NORMAL] = @fg_color
+
+  # toolbar colours are reversed
+  bg[PRELIGHT] = @fg_color
+  fg[PRELIGHT] = @bg_color
+
+  engine "moko-engine" {
+    gradient = TRUE
+    border = FALSE
+  }
+}
+widget_class "*Tool*GtkToggleButton" style "toolitem"
+widget_class "*Tool*GtkButton" style "toolitem"
+
+style "notebook"
+{
+  xthickness = 0
+  ythickness = 0
+
+  # For notebookes, NORMAL is used for the active tab and ACTIVE is used for
+  # ther other tabs
+  bg[NORMAL] = @selected_bg_color
+  fg[NORMAL] = @selected_fg_color
+
+  # inactive tabs are in "reversed" colours
+  fg[ACTIVE] = @bg_color
+  bg[ACTIVE] = @fg_color
+}
+class "GtkNotebook" style "notebook"
+
+style "menu"
+{
+  engine "moko-engine" {
+    gradient = FALSE
+    border = TRUE
+  }
+}
+class "GtkMenu" style "menu"
+
+style "menubar"
+{
+  engine "moko-engine" {
+    gradient = TRUE
+    border = FALSE
+  }
+}
+class "GtkMenuBar" style "menubar"
+widget_class "*GtkMenuBar*" style "reversed"
+
+style "menuitem"
+{
+  xthickness = 8
+  ythickness = 8
+
+  bg[PRELIGHT] = @selected_bg_color
+  fg[PRELIGHT] = @selected_fg_color
+
+  engine "moko-engine" {
+    gradient = FALSE
+    border = FALSE
+  }
+}
+widget_class "*MenuItem*" style "menuitem"
+
+style "scrollbar"
+{
+  bg[NORMAL] = @fg_color
+  bg[PRELIGHT] = @bg_color
+
+  engine "moko-engine" {
+    gradient = TRUE
+    border = FALSE
+  }
+}
+class "GtkScrollbar" style "scrollbar"
+
+include "matchboxpanel"
+include "openmoko-calculator"
+include "openmoko-contacts"
+include "openmoko-dialer"
+include "openmoko-panel-plugins"
+
+
