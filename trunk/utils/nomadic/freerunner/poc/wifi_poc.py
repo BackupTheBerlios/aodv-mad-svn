@@ -3,7 +3,51 @@
 
 import socket
 import struct
+import array
+import fcntl
 
+SIOCGIWAP = 0x8B15    # get AP MAC address
+IFNAMSIZE = 16
+SIOCGIFCONF = 0x8912    # ifconf struct
+
+class Wireless(object):
+    """Access to wireless interfaces"""
+    
+    def __init__(self, ifname):
+        self.sockfd = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.ifname = ifname
+        self.iwstruct = Iwstruct()
+
+    def getAPaddr(self):
+        """ returns accesspoint mac address 
+
+            >>> from iwlibs import Wireless, getNICnames
+            >>> ifnames = getNICnames()
+            >>> ifnames
+            ['eth1', 'wifi0']
+            >>> wifi = Wireless(ifnames[0])
+            >>> wifi.getAPaddr()
+            '00:0D:88:8E:4E:93'
+
+            Test with non-wifi card:
+            >>> wifi = Wireless('eth0')
+            >>> wifi.getAPaddr()
+            (95, 'Operation not supported')
+
+            Test with non-existant card:
+            >>> wifi = Wireless('eth2')
+            >>> wifi.getAPaddr()
+            (19, 'No such device')
+        """
+        buff, datastr = self.iwstruct.pack_wrq(32)
+        status, result = self.iwstruct.iw_get_ext(self.ifname, 
+                                                  SIOCGIWAP,
+                                                  data=datastr)
+        if status > 0:
+            return (status, result)
+
+        return self.iwstruct.getMAC(result)
+ 
 class Iwstruct(object):
     """basic class to handle iwstruct data """
     
@@ -61,7 +105,7 @@ class Iwstruct(object):
         """ read information from ifname """
         # put some additional data behind the interface name
         if data is not None:
-            buff = pythonwifi.flags.IFNAMSIZE-len(ifname)
+            buff = IFNAMSIZE-len(ifname)
             ifreq = ifname + '\0'*buff
             ifreq = ifreq + data
         else:
@@ -79,8 +123,40 @@ class Iwstruct(object):
         mac_addr = struct.unpack('xxBBBBBB', packed_data[:8])
         return "%02X:%02X:%02X:%02X:%02X:%02X" % mac_addr
 
+def getConfiguredNICnames():
+    """get the *configured* ifnames by a systemcall
+       
+       >>> getConfiguredNICnames()
+       []
+    """
+    iwstruct = Iwstruct()
+    ifnames = []
+    buff = array.array('c', '\0'*1024)
+    caddr_t, length = buff.buffer_info()
+    datastr = iwstruct.pack('iP', length, caddr_t)
+    try:
+        result = iwstruct._fcntl(SIOCGIFCONF, datastr)
+    except IOError, (i, error):
+        return i, error
+
+    # get the interface names out of the buffer
+    for i in range(0, 1024, 32):
+        ifname = buff.tostring()[i:i+32]
+        ifname = struct.unpack('32s', ifname)[0]
+        ifname = ifname.split('\0', 1)[0]
+        if ifname:
+            print "." + ifname + "."
+            # verify if ifnames are really wifi devices
+            wifi = Wireless(ifname)
+            result = wifi.getAPaddr()
+            if result[0] == 0:
+                ifnames.append(ifname)
+
+    return ifnames
+
 def main():
-       wstruct = Iwstruct() 
+        wstruct = Iwstruct() 
+        print getConfiguredNICnames()
 
 if __name__ == '__main__':
         main()
