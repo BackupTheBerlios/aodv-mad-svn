@@ -14,36 +14,19 @@ class Wireless(object):
     """Access to wireless interfaces"""
     
     def __init__(self, ifname):
-        self.sockfd = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        #self.sockfd = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.ifname = ifname
         self.iwstruct = Iwstruct()
 
     def getAPaddr(self):
         """ returns accesspoint mac address 
-
-            >>> from iwlibs import Wireless, getNICnames
-            >>> ifnames = getNICnames()
-            >>> ifnames
-            ['eth1', 'wifi0']
-            >>> wifi = Wireless(ifnames[0])
-            >>> wifi.getAPaddr()
-            '00:0D:88:8E:4E:93'
-
-            Test with non-wifi card:
-            >>> wifi = Wireless('eth0')
-            >>> wifi.getAPaddr()
-            (95, 'Operation not supported')
-
-            Test with non-existant card:
-            >>> wifi = Wireless('eth2')
-            >>> wifi.getAPaddr()
-            (19, 'No such device')
         """
         buff, datastr = self.iwstruct.pack_wrq(32)
         status, result = self.iwstruct.iw_get_ext(self.ifname, 
                                                   SIOCGIWAP,
                                                   data=datastr)
         if status > 0:
+	    # error: Operation not supported
             return (status, result)
 
         return self.iwstruct.getMAC(result)
@@ -119,8 +102,10 @@ class Iwstruct(object):
         return (0, result[16:])
 
     def getMAC(self, packed_data):
-        """ extracts mac addr from packed data and returns it as str """
+        """ extracts mac addr from packed data and returns it as str 
+	"""
         mac_addr = struct.unpack('xxBBBBBB', packed_data[:8])
+        print "%02X:%02X:%02X:%02X:%02X:%02X" % mac_addr
         return "%02X:%02X:%02X:%02X:%02X:%02X" % mac_addr
 
 def getConfiguredNICnames():
